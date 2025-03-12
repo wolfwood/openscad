@@ -155,6 +155,9 @@ static std::shared_ptr<AbstractNode> builtin_import(const ModuleInstantiation *i
 
 template<typename T>
 static std::unique_ptr<T> optionally_center(std::unique_ptr<T> g, bool center) {
+  bool auto_z = true;
+  double epsilon = 0.01;
+
   if (center) {
     auto bbox = g->getBoundingBox();
     auto center = bbox.center();
@@ -173,7 +176,10 @@ static std::unique_ptr<T> optionally_center(std::unique_ptr<T> g, bool center) {
 
       translate.x() = -center.x();
       translate.y() = -center.y();
-      translate.z() = -center.z();
+
+      if (!auto_z || bbox.min().z() < -epsilon || bbox.min().z() > epsilon) {
+        translate.z() = -center.z();
+      }
 
       g->transform(mat);
     }
